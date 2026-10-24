@@ -5,6 +5,8 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EventIcon from '@mui/icons-material/Event';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { addStoredPriorities, PRIORITY_OPTIONS, saveTaskPriority, removeTaskPriority } from './priorityStorage';
 
 function TaskList({ onEdit }) {
   const [tasks, setTasks] = useState([]);
@@ -33,13 +35,21 @@ function TaskList({ onEdit }) {
       const response = await fetch('/api/tasks');
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
-      setTasks(data);
+      setTasks(addStoredPriorities(data));
       setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePriorityChange = (taskId, priority) => {
+    if (!priority) return;
+    saveTaskPriority(taskId, priority);
+    setTasks(currentTasks => currentTasks.map(task => (
+      task.id === taskId ? { ...task, priority } : task
+    )));
   };
 
   const handleToggleComplete = async (task) => {
@@ -58,6 +68,7 @@ function TaskList({ onEdit }) {
   const handleDelete = async (id) => {
     try {
       await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      removeTaskPriority(id);
       fetchTasks();
     } catch (err) {
       setError('Failed to delete task');
@@ -127,9 +138,10 @@ function TaskList({ onEdit }) {
           <ListItem 
             key={task.id} 
             sx={{ 
-              pr: 18,
+              pr: { xs: 1, sm: 38 },
               py: 1,
               mb: 1,
+              flexWrap: { xs: 'wrap', sm: 'nowrap' },
               borderRadius: 2,
               background: task.completed 
                 ? 'rgba(158, 158, 158, 0.08)' 
@@ -198,11 +210,54 @@ function TaskList({ onEdit }) {
                 top: '50%',
                 transform: 'translateY(-50%)',
                 display: 'flex',
+                flexWrap: 'wrap',
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 1
+                justifyContent: 'flex-end',
+                gap: 1,
+                '@media (max-width: 600px)': {
+                  position: 'static',
+                  transform: 'none',
+                  marginLeft: 'auto'
+                }
               }}
             >
+                <ToggleButtonGroup
+                  exclusive
+                  size="small"
+                  value={task.priority}
+                  aria-label={`Priority for ${task.title}`}
+                  onChange={(_, priority) => handlePriorityChange(task.id, priority)}
+                  sx={{ flexShrink: 0 }}
+                >
+                  {PRIORITY_OPTIONS.map(priority => (
+                    <ToggleButton
+                      key={priority}
+                      value={priority}
+                      aria-label={priority}
+                      data-testid={`priority-${task.id}-${priority}`}
+                      sx={{
+                        minWidth: 32,
+                        px: 0.75,
+                        py: 0.25,
+                        color: 'white',
+                        backgroundColor: '#7A7A7A',
+                        borderColor: 'white',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        lineHeight: 1.2,
+                        '&:hover': { backgroundColor: '#666666' },
+                        '&.Mui-selected': {
+                          color: '#111111',
+                          backgroundColor: '#07F2E6',
+                          '&:hover': { backgroundColor: '#07F2E6' }
+                        }
+                      }}
+                    >
+                      {priority}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
               {task.due_date && (
                 <Chip
                   icon={<EventIcon sx={{ fontSize: 14 }} />}

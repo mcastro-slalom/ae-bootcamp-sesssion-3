@@ -3,6 +3,7 @@ import { CssBaseline, Container, AppBar, Toolbar, Typography, Box } from '@mui/m
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import TaskList from './TaskList';
 import TaskForm from './TaskForm';
+import { DEFAULT_PRIORITY, saveTaskPriority } from './priorityStorage';
 
 function App() {
   const [editingTask, setEditingTask] = useState(null);
@@ -16,14 +17,17 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task)
       });
+      saveTaskPriority(editingTask.id, task.priority || DEFAULT_PRIORITY);
       setEditingTask(null);
     } else {
       // Add new task
-      await fetch('/api/tasks', {
+      const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task)
       });
+      const savedTask = await response.json();
+      saveTaskPriority(savedTask.id, task.priority || DEFAULT_PRIORITY);
     }
     setRefreshKey(k => k + 1);
   };

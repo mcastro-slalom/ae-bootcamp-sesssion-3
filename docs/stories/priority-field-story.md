@@ -8,6 +8,12 @@
 ## Technical Requirements
 
 - Extend in-memory task object shape in frontend state to include `priority`.
-- When mapping backend `/api/items` (which returns `{id,name}`) to tasks, set `priority: 'P3'`.
-- Update local storage serialization to persist `priority`.
-- Add UI control (e.g., select dropdown) constrained to P1/P2/P3.
+- When mapping backend `/api/tasks` records into frontend state, merge a stored priority or default missing values to `P3`.
+- Persist selected priorities in browser local storage, keyed by the existing task ID, because the current API and database do not store priority.
+- Add an exclusive per-task priority control constrained to P1/P2/P3.
+
+## UI Reference
+
+![Priority field UI sketch](priority-field-ui-sketch.png)
+
+Priority choices should behave as exclusive radio buttons. Unselected choices use gray `#7A7A7A`; the selected choice uses blue `#07F2E6`.

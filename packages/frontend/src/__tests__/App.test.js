@@ -63,7 +63,10 @@ const server = setupServer(
 
 // Setup and teardown for the mock server
 beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  window.localStorage.clear();
+});
 afterAll(() => server.close());
 
 describe('TODO App', () => {
@@ -83,6 +86,29 @@ describe('TODO App', () => {
     await waitFor(() => {
       expect(screen.getByText('Test Task 1')).toBeInTheDocument();
       expect(screen.getByText('Test Task 2')).toBeInTheDocument();
+    });
+  });
+
+  test('defaults task priorities to P3 and persists a selected priority', async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<App />);
+
+    const defaultPriority = await screen.findByTestId('priority-1-P3');
+    expect(defaultPriority).toHaveAttribute('aria-pressed', 'true');
+    expect(defaultPriority).toHaveStyle({ backgroundColor: '#07F2E6' });
+    expect(screen.getByTestId('priority-1-P1')).toHaveStyle({ backgroundColor: '#7A7A7A' });
+    expect(screen.getByTestId('priority-1-P2')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('priority-1-P1'));
+    await waitFor(() => {
+      expect(screen.getByTestId('priority-1-P1')).toHaveAttribute('aria-pressed', 'true');
+    });
+    expect(JSON.parse(window.localStorage.getItem('todo-task-priorities'))).toEqual({ '1': 'P1' });
+
+    unmount();
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByTestId('priority-1-P1')).toHaveAttribute('aria-pressed', 'true');
     });
   });
 
@@ -120,6 +146,9 @@ describe('TODO App', () => {
     await user.click(screen.getByTestId('submit-task'));
     await waitFor(() => {
       expect(screen.getByText(/New Test Task/i)).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(JSON.parse(window.localStorage.getItem('todo-task-priorities'))).toHaveProperty('3', 'P3');
     });
   });
 
