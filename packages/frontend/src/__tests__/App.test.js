@@ -95,8 +95,9 @@ describe('TODO App', () => {
 
     const defaultPriority = await screen.findByTestId('priority-1-P3');
     expect(defaultPriority).toHaveAttribute('aria-pressed', 'true');
-    expect(defaultPriority).toHaveStyle({ backgroundColor: '#07F2E6' });
-    expect(screen.getByTestId('priority-1-P1')).toHaveStyle({ backgroundColor: '#7A7A7A' });
+    expect(defaultPriority).toHaveClass('priority-toggle', 'Mui-selected');
+    expect(screen.getByTestId('priority-1-P1')).toHaveClass('priority-toggle');
+    expect(screen.getByTestId('priority-1-P1')).not.toHaveClass('Mui-selected');
     expect(screen.getByTestId('priority-1-P2')).toBeInTheDocument();
 
     await user.click(screen.getByTestId('priority-1-P1'));

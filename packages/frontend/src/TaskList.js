@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import EventIcon from '@mui/icons-material/Event';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { addStoredPriorities, PRIORITY_OPTIONS, saveTaskPriority, removeTaskPriority } from './priorityStorage';
+import './PriorityControls.css';
 
 function TaskList({ onEdit }) {
   const [tasks, setTasks] = useState([]);
@@ -236,22 +237,14 @@ function TaskList({ onEdit }) {
                       value={priority}
                       aria-label={priority}
                       data-testid={`priority-${task.id}-${priority}`}
+                      className="priority-toggle"
                       sx={{
                         minWidth: 32,
                         px: 0.75,
                         py: 0.25,
-                        color: 'white',
-                        backgroundColor: '#7A7A7A',
-                        borderColor: 'white',
                         fontSize: '0.7rem',
                         fontWeight: 700,
-                        lineHeight: 1.2,
-                        '&:hover': { backgroundColor: '#666666' },
-                        '&.Mui-selected': {
-                          color: '#111111',
-                          backgroundColor: '#07F2E6',
-                          '&:hover': { backgroundColor: '#07F2E6' }
-                        }
+                        lineHeight: 1.2
                       }}
                     >
                       {priority}

@@ -1,0 +1,18 @@
+.priority-toggle.MuiToggleButton-root {
+  color: white;
+  background-color: #7A7A7A;
+  border-color: white;
+}
+
+.priority-toggle.MuiToggleButton-root:hover {
+  background-color: #666666;
+}
+
+.priority-toggle.MuiToggleButton-root.Mui-selected {
+  color: #111111;
+  background-color: #07F2E6;
+}
+
+.priority-toggle.MuiToggleButton-root.Mui-selected:hover {
+  background-color: #07F2E6;
+}
